@@ -1,0 +1,50 @@
+{
+  "reportConfigHash": "caf2d6aa",
+  "createdAtUtc": "2026-04-02T17:35:22.05333Z",
+  "entries": [
+    {
+      "packageName": "FluentValidation.DependencyInjectionExtensions",
+      "packageVersion": "11.9.0",
+      "insightsName": "FluentValidation.DependencyInjectionExtensions",
+      "insightsCurrentVersion": "11.9.0",
+      "insightsNewVersion": "",
+      "insightsDescription": "",
+      "insightsIsCompatible": true,
+      "insightsProjects": []
+    },
+    {
+      "packageName": "MediatR",
+      "packageVersion": "12.2.0",
+      "insightsName": "MediatR",
+      "insightsCurrentVersion": "12.2.0",
+      "insightsNewVersion": "",
+      "insightsDescription": "",
+      "insightsIsCompatible": true,
+      "insightsProjects": []
+    },
+    {
+      "packageName": "Microsoft.EntityFrameworkCore.SqlServer",
+      "packageVersion": "8.0.2",
+      "insightsName": "Microsoft.EntityFrameworkCore.SqlServer",
+      "insightsCurrentVersion": "8.0.2",
+      "insightsNewVersion": "10.0.5",
+      "insightsDescription": "NuGet package upgrade is recommended",
+      "insightsIsCompatible": true,
+      "insightsProjects": [
+        "enterprise-travel-and-expense-management-system/enterprise-travel-and-expense-management-system.csproj"
+      ]
+    },
+    {
+      "packageName": "Microsoft.EntityFrameworkCore.Tools",
+      "packageVersion": "8.0.2",
+      "insightsName": "Microsoft.EntityFrameworkCore.Tools",
+      "insightsCurrentVersion": "8.0.2",
+      "insightsNewVersion": "10.0.5",
+      "insightsDescription": "NuGet package upgrade is recommended",
+      "insightsIsCompatible": true,
+      "insightsProjects": [
+        "enterprise-travel-and-expense-management-system/enterprise-travel-and-expense-management-system.csproj"
+      ]
+    }
+  ]
+}
