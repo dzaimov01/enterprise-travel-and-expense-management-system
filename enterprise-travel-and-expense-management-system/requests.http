@@ -1,0 +1,467 @@
+###
+### Enterprise Travel & Expense Management System - API Test Suite
+###
+### This file contains all API requests for testing the entire project.
+### Use the REST Client extension in VS Code to run these requests.
+###
+### Requirements:
+### - API running on http://localhost:5142
+### - REST Client extension installed
+###
+
+@baseUrl = http://localhost:5142/api
+@contentType = application/json
+
+###
+### ============================================================================
+### AUTHENTICATION ENDPOINTS
+### ============================================================================
+###
+
+### Login as Employee
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "employee@example.com",
+  "role": "Employee"
+}
+
+### Login as Manager
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "manager@example.com",
+  "role": "Manager"
+}
+
+### Login with invalid role (should fail)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user@example.com",
+  "role": "Admin"
+}
+
+### Login with missing email (should fail)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "role": "Employee"
+}
+
+###
+### ============================================================================
+### TRAVEL REQUESTS ENDPOINTS
+### ============================================================================
+###
+
+### Create Travel Request - Valid
+### Note: Replace {{token}} with actual token from login response
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Paris",
+  "startDate": "2026-05-15T00:00:00Z",
+  "endDate": "2026-05-20T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Different destination
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "London",
+  "startDate": "2026-06-01T00:00:00Z",
+  "endDate": "2026-06-05T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Long duration trip
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Tokyo",
+  "startDate": "2026-07-10T00:00:00Z",
+  "endDate": "2026-07-25T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Invalid: Empty destination (should fail)
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "",
+  "startDate": "2026-05-15T00:00:00Z",
+  "endDate": "2026-05-20T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Invalid: Past start date (should fail)
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Berlin",
+  "startDate": "2025-01-01T00:00:00Z",
+  "endDate": "2025-01-05T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Invalid: End date before start date (should fail)
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Madrid",
+  "startDate": "2026-05-20T00:00:00Z",
+  "endDate": "2026-05-15T00:00:00Z",
+  "userId": 1
+}
+
+### Create Travel Request - Invalid: Invalid user ID (should fail)
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Rome",
+  "startDate": "2026-05-15T00:00:00Z",
+  "endDate": "2026-05-20T00:00:00Z",
+  "userId": 999
+}
+
+### Create Travel Request - Missing authorization (should fail)
+POST {{baseUrl}}/travelrequests
+Content-Type: {{contentType}}
+
+{
+  "destination": "Amsterdam",
+  "startDate": "2026-05-15T00:00:00Z",
+  "endDate": "2026-05-20T00:00:00Z",
+  "userId": 1
+}
+
+###
+### Get All Travel Requests - No filters
+GET {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by status: Pending
+GET {{baseUrl}}/travelrequests?status=Pending
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by status: Approved
+GET {{baseUrl}}/travelrequests?status=Approved
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by status: Rejected
+GET {{baseUrl}}/travelrequests?status=Rejected
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by status: Completed
+GET {{baseUrl}}/travelrequests?status=Completed
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by status: Cancelled
+GET {{baseUrl}}/travelrequests?status=Cancelled
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Filter by date range
+GET {{baseUrl}}/travelrequests?startDateFrom=2026-05-01T00:00:00Z&endDateTo=2026-06-01T00:00:00Z
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Multiple filters: status and date range
+GET {{baseUrl}}/travelrequests?status=Pending&startDateFrom=2026-05-01T00:00:00Z&endDateTo=2026-08-01T00:00:00Z
+Authorization: Bearer {{token}}
+
+### Get All Travel Requests - Without authorization (should fail)
+GET {{baseUrl}}/travelrequests
+
+###
+### Get Travel Request by ID - Valid (replace {id} with actual ID from creation response)
+GET {{baseUrl}}/travelrequests/1
+Authorization: Bearer {{token}}
+
+### Get Travel Request by ID - Non-existent (should fail)
+GET {{baseUrl}}/travelrequests/9999
+Authorization: Bearer {{token}}
+
+### Get Travel Request by ID - Without authorization (should fail)
+GET {{baseUrl}}/travelrequests/1
+
+###
+### Approve Travel Request - Valid (requires Manager role)
+### Note: Replace {{managerToken}} with token from manager login
+### Note: Replace {id} with actual travel request ID
+PUT {{baseUrl}}/travelrequests/1/approve
+Authorization: Bearer {{managerToken}}
+
+### Approve Travel Request - As Employee (should fail - requires Manager role)
+PUT {{baseUrl}}/travelrequests/1/approve
+Authorization: Bearer {{employeeToken}}
+
+### Approve Travel Request - Non-existent request (should fail)
+PUT {{baseUrl}}/travelrequests/9999/approve
+Authorization: Bearer {{managerToken}}
+
+### Approve Travel Request - Without authorization (should fail)
+PUT {{baseUrl}}/travelrequests/1/approve
+
+###
+### ============================================================================
+### EXPENSES ENDPOINTS
+### ============================================================================
+###
+
+### Submit Expense - Valid (for approved travel request)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 150.50,
+  "currency": "USD",
+  "description": "Hotel accommodation in Paris"
+}
+
+### Submit Expense - Multiple items for same trip
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 75.00,
+  "currency": "USD",
+  "description": "Meals and dining"
+}
+
+### Submit Expense - With receipt file (base64-encoded example)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 200.00,
+  "currency": "EUR",
+  "description": "Transportation - Flight ticket",
+  "receiptBase64": "JVBERi0xLjQKJeLjz9MNCjEgMCBvYmo=",
+  "receiptFileName": "flight_receipt.pdf"
+}
+
+### Submit Expense - Different currency
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 180.00,
+  "currency": "GBP",
+  "description": "Restaurant - Dinner"
+}
+
+### Submit Expense - Large amount
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 5000.00,
+  "currency": "USD",
+  "description": "Conference registration fee"
+}
+
+### Submit Expense - Invalid: Missing required fields (should fail)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1
+}
+
+### Submit Expense - Invalid: Negative amount (should fail)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": -50.00,
+  "currency": "USD",
+  "description": "Invalid expense"
+}
+
+### Submit Expense - Invalid: Zero amount (should fail)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 0,
+  "currency": "USD",
+  "description": "Invalid expense"
+}
+
+### Submit Expense - Invalid: Non-existent travel request (should fail)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 9999,
+  "amount": 100.00,
+  "currency": "USD",
+  "description": "Expense for non-existent trip"
+}
+
+### Submit Expense - Invalid: Travel request not approved (should fail)
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 2,
+  "amount": 100.00,
+  "currency": "USD",
+  "description": "Expense for pending trip"
+}
+
+###
+### ============================================================================
+### COMPLETE WORKFLOW SCENARIO
+### ============================================================================
+###
+### Step 1: Employee logs in
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john.doe@company.com",
+  "role": "Employee"
+}
+
+### Step 2: Employee creates a travel request
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "New York",
+  "startDate": "2026-08-15T00:00:00Z",
+  "endDate": "2026-08-22T00:00:00Z",
+  "userId": 1
+}
+
+### Step 3: Get all pending travel requests
+GET {{baseUrl}}/travelrequests?status=Pending
+Authorization: Bearer {{token}}
+
+### Step 4: Manager logs in
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "jane.smith@company.com",
+  "role": "Manager"
+}
+
+### Step 5: Manager retrieves specific request (replace {id} with ID from step 2)
+GET {{baseUrl}}/travelrequests/1
+Authorization: Bearer {{managerToken}}
+
+### Step 6: Manager approves the travel request (replace {id} with ID from step 2)
+PUT {{baseUrl}}/travelrequests/1/approve
+Authorization: Bearer {{managerToken}}
+
+### Step 7: Employee submits expenses for approved trip (employee logs in again)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john.doe@company.com",
+  "role": "Employee"
+}
+
+### Step 8: Submit first expense
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 250.00,
+  "currency": "USD",
+  "description": "Hotel - 7 nights in Manhattan"
+}
+
+### Step 9: Submit second expense
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": 1,
+  "amount": 150.00,
+  "currency": "USD",
+  "description": "Meals and transportation"
+}
+
+### Step 10: View all travel requests to see approved status
+GET {{baseUrl}}/travelrequests?status=Approved
+Authorization: Bearer {{token}}
+
+###
+### ============================================================================
+### ERROR HANDLING TEST CASES
+### ============================================================================
+###
+
+### Test: Invalid JWT token
+GET {{baseUrl}}/travelrequests
+Authorization: Bearer invalid_token_12345
+
+### Test: Malformed JSON in request body
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Paris"
+  "startDate": "2026-05-15T00:00:00Z"
+}
+
+### Test: Empty request body
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+### Test: Invalid date format
+POST {{baseUrl}}/travelrequests
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "destination": "Paris",
+  "startDate": "invalid-date",
+  "endDate": "2026-05-20",
+  "userId": 1
+}
+
+### Test: String value for numeric field
+POST {{baseUrl}}/expenses
+Content-Type: {{contentType}}
+
+{
+  "travelRequestId": "invalid",
+  "amount": 100,
+  "currency": "USD",
+  "description": "Test"
+}
