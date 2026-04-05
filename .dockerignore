@@ -1,0 +1,29 @@
+# VCS
+.git
+.gitignore
+
+# IDE
+.vs
+.vscode
+.classpath
+.project
+.settings
+.toolstarget
+.aws
+
+# Build artifacts
+**/bin
+**/obj
+**/dist
+
+# Environment and sensitive files
+.env
+.env.local
+.env.*.local
+
+# Development files
+**/logs
+**/.nuget
+
+# Don't exclude these - they're needed for the build
+# Note: Dockerfile and .dockerignore should NOT be excluded

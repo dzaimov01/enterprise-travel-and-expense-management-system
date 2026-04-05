@@ -1,0 +1,56 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: travel_expense_sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourComplexPassword123!@#"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - travel_expense_network
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "YourComplexPassword123!@#" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: travel_expense_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=TravelExpenseManagement;User Id=sa;Password=YourComplexPassword123!@#;TrustServerCertificate=true;"
+      Jwt__SecretKey: "your-super-secret-key-min-32-characters-long!"
+      Jwt__Issuer: "TravelExpenseApp"
+      Jwt__Audience: "TravelExpenseAppUsers"
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - travel_expense_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  travel_expense_network:
+    driver: bridge
