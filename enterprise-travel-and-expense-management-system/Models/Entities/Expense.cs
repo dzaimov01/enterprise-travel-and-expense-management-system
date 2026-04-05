@@ -10,9 +10,15 @@ public class Expense
 
     public string Description { get; set; } = null!;
 
+    /// <summary>
+    /// Path to the receipt file (relative to wwwroot).
+    /// </summary>
+    public string? ReceiptFilePath { get; set; }
+
     // Foreign key
     public int TravelRequestId { get; set; }
 
     // Navigation property
     public TravelRequest TravelRequest { get; set; } = null!;
 }
+

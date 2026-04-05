@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="enterprise-travel-and-expense-management-system.Tests/enterprise-travel-and-expense-management-system.Tests.csproj" />
   <Project Path="enterprise-travel-and-expense-management-system/enterprise-travel-and-expense-management-system.csproj" />
 </Solution>

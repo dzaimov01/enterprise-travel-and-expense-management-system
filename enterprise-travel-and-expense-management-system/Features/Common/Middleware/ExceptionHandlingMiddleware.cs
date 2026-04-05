@@ -5,7 +5,7 @@ namespace enterprise_travel_and_expense_management_system.Features.Common.Middle
 
 /// <summary>
 /// Middleware to handle exceptions and convert them to appropriate HTTP responses.
-/// Specifically handles ValidationException from FluentValidation.
+/// Handles: ValidationException (400), UnauthorizedAccessException (403), and general exceptions (500).
 /// </summary>
 public class ExceptionHandlingMiddleware
 {
@@ -37,6 +37,15 @@ public class ExceptionHandlingMiddleware
                     g => g.Select(e => e.ErrorMessage).ToArray());
 
             var response = new { errors };
+            await context.Response.WriteAsJsonAsync(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Authorization error: {Message}", ex.Message);
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+
+            var response = new { error = ex.Message };
             await context.Response.WriteAsJsonAsync(response);
         }
         catch (Exception ex)
